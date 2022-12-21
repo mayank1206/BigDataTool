@@ -7,6 +7,49 @@
     bottom: 0;
     position: absolute;
 }
+
 b{
     color: #FF8C00;
+}
+
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 1.428571429;
+    border-radius: 15px;
+}
+
+.btn-circle.btn-lg {
+    width: 50px;
+    height: 50px;
+    padding: 10px 16px;
+    font-size: 18px;
+    line-height: 1.33;
+    border-radius: 25px;
+}
+
+.icon-color{
+    background: #FF8C00;
+    color: rgba(var(--bs-dark-rgb),var(--bs-bg-opacity))!important;
+}
+
+.round-edge{
+    border-radius: 25px;
+}
+
+.shadow-container {
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.300)!important;
+}
+
+.min-height-con{
+    min-height: 300px;
+}
+.max-height-con{
+    max-height: 800px;
+}
+.min-height-bottom{
+    min-height: 100px;
 }
