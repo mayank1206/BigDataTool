@@ -9,69 +9,27 @@
 		<div class="col-sm-5 p-3">
             <div class="float-end">
                 <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
-			    <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-folder" aria-hidden="true"></i></button>
+			    <!--<button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-folder" aria-hidden="true"></i></button>
                 <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-upload" aria-hidden="true"></i></button>
                 <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-trash" aria-hidden="true"></i></button>
+                -->
             </div>
         </div>
 	</div>
-	<div class="row p-2">
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file test length.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder test lenght</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
-            <div class="text-truncate">file.txt</div>
-        </div>
-        <div class="col-sm-1 m-2 p-2">
-            <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
-            <div class="text-truncate" >folder</div>
-        </div>
+	<div class="row p-2" id="files">
+        {% for file in FileStatuses.FileStatus %}
+            {% if file.type == 'DIRECTORY' %}
+                <div class="col-sm-1 m-2 p-2 folder" value={{file.pathSuffix}}> 
+                    <i class="fa fa-folder" aria-hidden="true" style="font-size: 50px; color:rgb(95,99,104);"></i>
+                    <div class="text-truncate" >{{file.pathSuffix}}</div>
+                </div>
+            {% else %}
+                <div class="col-sm-1 m-2 p-2">
+                    <i class="fa fa-file-text" aria-hidden="true" style="font-size: 50px; color: rgb(25,103,210);" ></i>
+                    <div class="text-truncate">{{file.pathSuffix}}</div>
+                </div>
+            {% endif %}
+        {% endfor %} 
 	</div>
 </div>
 <div class="min-height-bottom">
