@@ -11,29 +11,57 @@ def is_ajax(request):
 def home(request):
     return render(request,'home.html')
 
-#drive_home
-
+#==========================================DRIVE_HOME=================================================================
+current_path=""
 def drive_home(request):
+    global current_path
     if is_ajax(request=request):
-        text = request.GET.get('button_text')
-        response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop/"+text+"?op=LISTSTATUS")
-        context = response.json()
-        return JsonResponse(context,status=200)
-    
-    response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop?op=LISTSTATUS")
-    context = response.json()
-    return render(request,'drive/drive_home.html',context)
+        action = request.GET.get('action')
 
+        #Open Folder
+        if action == "open":
+            dir = request.GET.get('button_text')
+            if current_path == "":
+                response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop/"+dir+"?op=LISTSTATUS")
+                current_path = dir
+            else:
+                response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop/"+current_path+"/"+dir+"?op=LISTSTATUS")
+                current_path = current_path+"/"+dir
+            context = response.json()
+            return JsonResponse(context,status=200)
+        
+        #back Button
+        elif action == "back":
+            l = current_path.rsplit('/', 1)
+            if len(l) <= 1:
+                current_path=""
+            else:
+                current_path=l[0]
+
+            if current_path == "":
+                response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop?op=LISTSTATUS")
+            else:
+                response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop/"+current_path+"?op=LISTSTATUS")
+            context = response.json()
+            return JsonResponse(context,status=200)
+
+    else:
+        current_path=""
+        response = requests.get("http://localhost:9870/webhdfs/v1/user/hadoop?op=LISTSTATUS")
+        context = response.json()
+        return render(request,'drive/drive_home.html',context)
+
+#==============================CSV_HOME================================================================================
 def csv_home(request):
     return render(request,'csv/csv_home.html')
-
-def pdf_home(request):
-    return render(request,'pdf/pdf_home.html')
-
-#csv
- 
 def csv_edit(request):
     return render(request,'csv/csv_edit.html')
+
+#================================PDF_HOME===============================================================================
+def pdf_home(request):
+    return render(request,'pdf/pdf_home.html')
+ 
+
 
 
 
