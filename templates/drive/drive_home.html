@@ -9,8 +9,8 @@
 		<div class="col-sm-5 p-3">
             <div class="float-end">
                 <button type="button" class="btn icon-color btn-circle btn-lg back_folder btn-outline-light"><i class="fa fa-arrow-left" aria-hidden="true"></i></button>
-			    <!--<button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-folder" aria-hidden="true"></i></button>
-                <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-upload" aria-hidden="true"></i></button>
+			    <button type="button" class="btn icon-color btn-circle btn-lg btn-outline-light" data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fa fa-folder" aria-hidden="true"></i></button>
+                <!--<button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-upload" aria-hidden="true"></i></button>
                 <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-trash" aria-hidden="true"></i></button>
                     
                 -->
@@ -35,5 +35,23 @@
 	</div>
 </div>
 <div class="min-height-bottom">
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Enter Directory Name</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-outline">
+                <input type="text" id="form12" class="form-control dir_name"  />
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary new_folder" data-bs-dismiss="modal">Create</button>
+        </div>
+      </div>
+    </div>
 </div>
 {% endblock %}
