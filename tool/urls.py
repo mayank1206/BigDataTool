@@ -10,5 +10,5 @@ urlpatterns = [
     path('pdf_home',views.pdf_home,name='pdf_home'),
     
     #csv
-    path('csv_edit',views.csv_edit,name='csv_edit')
+    path('csv_edit/<int:id>/',views.csv_edit,name='csv_edit')
 ]

@@ -54,3 +54,9 @@ b{
 .min-height-bottom{
     min-height: 100px;
 }
+
+a{
+    color: black;
+    background-color: transparent;
+    text-decoration: none;
+}

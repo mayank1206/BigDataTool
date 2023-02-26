@@ -8,70 +8,49 @@
 		</div>
 		<div class="col-sm-2 p-3">
             <div class="float-end">
-			    <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                <button type="button" class="btn icon-color btn-circle btn-lg"><i class="fa fa-minus" aria-hidden="true"></i></button>
+			    <button type="button" class="btn icon-color btn-circle btn-lg" data-bs-toggle="modal" data-bs-target="#newPipline"><i class="fa fa-plus" aria-hidden="true"></i></button>
+                <button type="button" class="btn icon-color btn-circle btn-lg delete_csv_schedule"><i class="fa fa-minus" aria-hidden="true"></i></button>
             </div>
         </div>
 	</div>
 	<div class="p-2">
 		<table class="table">
-            <tbody>
+            <tbody id="field_table" >
+                {% for list in csv_list %}
                 <tr>
                     <td>
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                            <label class="" for="flexCheckDefault">
-                                Default checkboxhcgfchgc
+                            <input class="form-check-input" type="radio" name="inlineRadioOptions" value={{list.id}}>
+                            <label class="form-check-label" for="inlineRadio1">
+                                <a href="{% url 'csv_edit' id=list.id %}"> 
+                                    {{list.text}}
+                                </a>
                             </label>
-                            <a href="{% url 'csv_edit' %}"> 
-                                hvhgchc
-                            </a>
                         </div>
                     </td>
                 </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Default checkbox
-                                </label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Default checkbox
-                                </label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Default checkbox
-                                </label>
-                        </div>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="" id="flexCheckDefault">
-                                <label class="form-check-label" for="flexCheckDefault">
-                                    Default checkbox
-                                </label>
-                        </div>
-                    </td>
-                </tr>
+                {% endfor %} 
             </tbody>
-          </table> 
+        </table> 
 	</div>
+</div>
+<div class="modal fade" id="newPipline" tabindex="-1" aria-labelledby="newPiplineLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="newPiplineLabel">Create New Pipline </h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            <div class="form-outline">
+                <input type="text" placeholder="Name" id="form12" class="form-control csv_schedule_name"  />
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary new_csv_schedule" data-bs-dismiss="modal">Create</button>
+        </div>
+      </div>
+    </div>
 </div>
 <div class="min-height-bottom">
 </div>
