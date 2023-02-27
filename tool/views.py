@@ -1,13 +1,13 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import requests
-from .models import CsvPipline
+from .models import PiplineDetails
+import json 
 
-#ajax handler
+
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-# Create your views here.
-
+    
 def home(request):
     return render(request,'home.html')
 
@@ -19,7 +19,6 @@ def drive_home(request):
     if is_ajax(request=request):
         action = request.GET.get('action')
 
-        #Open Folder
         if action == "open":
             dir = request.GET.get('button_text')
             if current_path == "":
@@ -31,7 +30,6 @@ def drive_home(request):
             context = response.json()
             return JsonResponse(context,status=200)
         
-        #back Button
         elif action == "back":
             l = current_path.rsplit('/', 1)
             if len(l) <= 1:
@@ -63,12 +61,12 @@ def drive_home(request):
 
         elif action == "delete_folder":
             dir_name = request.GET.get('dir_name')
+            print(dir_name)
             if dir_name != None:
-                print(dir_name)
                 if current_path == "":
-                    response = requests.put(localhost+"webhdfs/v1/user/hadoop/"+dir_name+"?user.name=hadoop&op=DELETE&recursive=true")
+                    response = requests.delete(localhost+"webhdfs/v1/user/hadoop/"+dir_name+"?user.name=hadoop&op=DELETE&recursive=true")
                 else:
-                    response = requests.put(localhost+"webhdfs/v1/user/hadoop/"+current_path+"/"+dir_name+"?user.name=hadoop&op=DELETE&recursive=true")
+                    response = requests.delete(localhost+"webhdfs/v1/user/hadoop/"+current_path+"/"+dir_name+"?user.name=hadoop&op=DELETE&recursive=true")
 
 
             if current_path == "":
@@ -78,6 +76,11 @@ def drive_home(request):
             context = response.json()
             return JsonResponse(context,status=200)
 
+        elif action == "copy_current_path":
+            data=[]
+            data.append("/user/hadoop/"+current_path) 
+            return JsonResponse(data, safe=False)
+
     else:
         current_path=""
         response = requests.get(localhost+"webhdfs/v1/user/hadoop?op=LISTSTATUS")
@@ -86,37 +89,78 @@ def drive_home(request):
 
 #==============================CSV_HOME================================================================================
 def csv_home(request):
-    print("test")
     if is_ajax(request=request):
         action = request.GET.get('action')
-
-        if action == "new_csv_schedule":
-            name = request.GET.get('csv_schedule_name')
-            obj = CsvPipline()
-            obj.text = name
-            obj.save()
-            data = list(CsvPipline.objects.all().values())
-            return JsonResponse(data,safe=False)
-
-        elif action == "delete_csv_schedule":
+        if action == "delete_csv_schedule":
             id = request.GET.get('csv_schedule_id')
             if id != None:
-                CsvPipline.objects.filter(id=id).delete()
-                #delete the pipline 
-            data = list(CsvPipline.objects.all().values())
+                #delete the Pipline data
+                PiplineDetails.objects.filter(id=id).delete()
+                
+            data = list(PiplineDetails.objects.all().values())
             return JsonResponse(data,safe=False)
-            
     else:
-        csv_list = CsvPipline.objects.values()
+        csv_list = PiplineDetails.objects.values()
         context = {
             'csv_list': csv_list,
         }
         return render(request,'csv/csv_home.html',context)
 
+#==============================COMMON================================================================================
+def create(request,file_type):
+    if request.method == 'POST':
+        if request.POST['piplineName'] != "" and request.POST['fileType'] != "" and request.POST['filePath'] != "" and request.POST['scheduleTime'] != "" and request.POST['tableName'] != "" and request.POST['databaseName'] != "":
+            obj = PiplineDetails()
+            obj.text = request.POST['piplineName']
+            obj.file_type = request.POST['fileType']
+            obj.file_path = request.POST['filePath']
+            obj.schedule_time = request.POST['scheduleTime']
+            obj.table_name = request.POST['tableName']
+            obj.database_name = request.POST['databaseName']
+            obj.save()
+            if request.POST['fileType'] == "CSV":
+                return redirect("csv_home")
+            else:
+                return redirect("pdf_home")
+        
+        return redirect(request.META['HTTP_REFERER'])  
+    else:
+        context = {
+            'file_type': file_type,
+        }
+        return render(request,'common/create.html',context)
 
-def csv_edit(request,id):
+def edit(request,id):
+    if request.method == 'POST':
+        if request.POST['piplineName'] != "" and request.POST['fileType'] != "" and request.POST['filePath'] != "" and request.POST['scheduleTime'] != "" and request.POST['tableName'] != "" and request.POST['databaseName'] != "":
+            # Pipline_details = PiplineDetails.objects.filter(id=id).values()
+        # hive_details = CsvHiveTableDetails.objects.filter(csv_id=Pipline_details["csv_id"]).values()
+            # csv_id = models.AutoField(primary_key=True)
+            obj = PiplineDetails()
+            obj.text = request.POST['piplineName']
+            obj.file_type = request.POST['fileType']
+            obj.file_path = request.POST['filePath']
+            obj.schedule_time = request.POST['scheduleTime']
+            obj.table_name = request.POST['tableName']
+            obj.database_name = request.POST['databaseName']
+            obj.save()
+            if request.POST['fileType'] == "CSV":
+                return redirect("csv_home")
+            else:
+                return redirect("pdf_home")
+        
+        return redirect(request.META['HTTP_REFERER'])  
+    else:
+        context = {
+            'file_type': file_type,
+        }
+        return render(request,'common/create.html',context)
 
-    return render(request,'csv/csv_edit.html')
+def hive_edit(request,id):
+    context = {
+        'csv_list': id,
+    }
+    return render(request,'common/hive_edit.html',context)
 
 #================================PDF_HOME===============================================================================
 def pdf_home(request):

@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container shadow-container min-height-con mt-5 overflow-hidden round-edge">
+	<div class="row bg-dark text-white">
+		<div class="col-sm-7 p-3">
+			<h2>Table Column</h2>
+		</div>
+		<div class="col-sm-5 p-3">
+            <div class="float-end">
+                <button type="button" class="btn icon-color btn-circle btn-lg btn-outline-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Shell script and spark submit is used to enter the data into the hive"><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+            </div>
+        </div>
+	</div>
+	<div class="p-2">
+		<form>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+						<input type="hiveColumnName" class="form-control" id="hiveColumnName" placeholder="Hive Column Name">
+				    </div>
+					<div class="col-auto">	
+						<input type="tableHeaderName" class="form-control" id="tableHeaderName" placeholder="Table Header Name">	
+					</div>
+					<div class="col-auto"><button type="add" class="btn btn-primary">Remove</button></div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+						<input type="hiveColumnName" class="form-control" id="hiveColumnName" placeholder="Hive Column Name">
+				    </div>
+					<div class="col-auto">	
+						<input type="tableHeaderName" class="form-control" id="tableHeaderName" placeholder="Table Header Name">	
+					</div>
+					<div class="col-auto"><button type="add" class="btn btn-primary">Add</button></div>	
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Submit</button>
+		</form> 
+	</div>
+</div>
+<div class="min-height-bottom">
+</div>
+{% endblock %}

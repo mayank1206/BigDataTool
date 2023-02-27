@@ -8,8 +8,17 @@
 		</div>
 		<div class="col-sm-2 p-3">
             <div class="float-end">
-			    <button type="button" class="btn icon-color btn-circle btn-lg" data-bs-toggle="modal" data-bs-target="#newPipline"><i class="fa fa-plus" aria-hidden="true"></i></button>
-                <button type="button" class="btn icon-color btn-circle btn-lg delete_csv_schedule"><i class="fa fa-minus" aria-hidden="true"></i></button>
+			    <button type="button" class="btn icon-color btn-circle btn-lg">
+                    <a href="{% url 'create' file_type='CSV' %}"> 
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                    </a>
+                </button>
+                <button type="button" class="btn icon-color btn-circle btn-lg edit_csv_details">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="btn icon-color btn-circle btn-lg delete_csv_schedule">
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
 	</div>
@@ -22,7 +31,7 @@
                         <div class="form-check">
                             <input class="form-check-input" type="radio" name="inlineRadioOptions" value={{list.id}}>
                             <label class="form-check-label" for="inlineRadio1">
-                                <a href="{% url 'csv_edit' id=list.id %}"> 
+                                <a href="{% url 'hive_edit' id=list.id %}"> 
                                     {{list.text}}
                                 </a>
                             </label>
@@ -33,24 +42,6 @@
             </tbody>
         </table> 
 	</div>
-</div>
-<div class="modal fade" id="newPipline" tabindex="-1" aria-labelledby="newPiplineLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="newPiplineLabel">Create New Pipline </h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-            <div class="form-outline">
-                <input type="text" placeholder="Name" id="form12" class="form-control csv_schedule_name"  />
-            </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-primary new_csv_schedule" data-bs-dismiss="modal">Create</button>
-        </div>
-      </div>
-    </div>
 </div>
 <div class="min-height-bottom">
 </div>

@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container shadow-container min-height-con mt-5 overflow-hidden round-edge">
+	<div class="row bg-dark text-white">
+		<div class="col-sm-7 p-3">
+			<h2>Edit</h2>
+		</div>
+		<div class="col-sm-5 p-3">
+            <div class="float-end">
+                <button type="button" class="btn icon-color btn-circle btn-lg btn-outline-light" data-bs-toggle="tooltip" data-bs-placement="bottom" title="Shell script and spark submit is going to create"><i class="fa fa-info-circle" aria-hidden="true"></i></button>
+            </div>
+        </div>
+	</div>
+	<div class="p-2">
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="hidden" class="form-control" name="fileType" placeholder="Pipline name" value="{{file_type}}">
+            <div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+			  			<label class="form-label" style="width: 130px;">Pipline Name</label>
+					</div>
+					<div class="col-auto">	
+						<input type="piplineName" class="form-control" name="piplineName" placeholder="Pipline name">
+					</div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+			  			<label class="form-label" style="width: 130px;">File Path</label>
+					</div>
+					<div class="col-auto">	
+						<input type="filePath" class="form-control" name="filePath" placeholder="HDFS file path">
+					</div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+			  			<label class="form-label" style="width: 130px;">Schedule Time</label>
+					</div>
+					<div class="col-auto">	
+						<input type="scheduleTime" class="form-control" name="scheduleTime" placeholder="Schedule Cron Time">
+					</div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+			  			<label class="form-label" style="width: 130px;">Table Name</label>
+					</div>
+					<div class="col-auto">	
+						<input type="tableName" class="form-control" name="tableName" placeholder="Table Name">
+					</div>
+				</div>
+			</div>
+			<div class="mb-3">
+				<div class="row g-3 align-items-center">
+					<div class="col-auto">
+			  			<label class="form-label" style="width: 130px;">Database Name</label>
+					</div>
+					<div class="col-auto">	
+						<input type="databaseName" class="form-control" name="databaseName" placeholder="Database Name">
+					</div>
+				</div>
+			</div>
+			<button type="submit" class="btn btn-primary">Create</button>
+		</form> 
+	</div>
+</div>
+<div class="min-height-bottom">
+</div>
+{% endblock %}
