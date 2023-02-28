@@ -1,0 +1,4 @@
+test
+/user/hadoop/csv_test
+5 * * * *
+user

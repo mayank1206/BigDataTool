@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse
 import requests
-from .models import PiplineDetails
+from .models import PiplineDetails, HiveTableDetails
 import json 
+import os
+import csv
 
 
 def is_ajax(request):
@@ -10,6 +12,25 @@ def is_ajax(request):
 
 def home(request):
     return render(request,'home.html')
+
+def create_csv(id,path):
+    os.system("rm /home/hadoop/project/BigDataTool/tool/hold/*")
+    os.system("hdfs dfs -get "+path+"/* /home/hadoop/project/BigDataTool/tool/hold/")
+    file_name = os.listdir("/home/hadoop/project/BigDataTool/tool/hold/")
+    
+    with open("/home/hadoop/project/BigDataTool/tool/hold/"+file_name[0], mode ='r') as file:
+        csvFile = csv.reader(file)
+        for lines in csvFile:
+            header = lines
+            break
+    for name in header:
+        obj = HiveTableDetails()
+        obj.file_id = id
+        obj.column_name = name
+        obj.file_column_name = name
+        obj.save()
+
+# os.system('(crontab -l 2>/dev/null; echo "'+schedule_time+' /path/to/job -with args") | crontab -')
 
 #==========================================DRIVE_HOME=================================================================
 current_path=""
@@ -109,20 +130,20 @@ def csv_home(request):
 #==============================COMMON================================================================================
 def create(request,file_type):
     if request.method == 'POST':
-        if request.POST['piplineName'] != "" and request.POST['fileType'] != "" and request.POST['filePath'] != "" and request.POST['scheduleTime'] != "" and request.POST['tableName'] != "" and request.POST['databaseName'] != "":
+        if request.POST['piplineName'] != "" and request.POST['fileType'] != "" and request.POST['filePath'] != "" and request.POST['scheduleTime'] != "" and request.POST['tableName'] != "":
             obj = PiplineDetails()
             obj.text = request.POST['piplineName']
             obj.file_type = request.POST['fileType']
             obj.file_path = request.POST['filePath']
             obj.schedule_time = request.POST['scheduleTime']
             obj.table_name = request.POST['tableName']
-            obj.database_name = request.POST['databaseName']
             obj.save()
-            #create process
-            # function(id,fileType)
+            
             if request.POST['fileType'] == "CSV":
+                create_csv(obj.pk,request.POST['filePath'])
                 return redirect("csv_home")
             else:
+                #create_pdf
                 return redirect("pdf_home")
         
         return redirect(request.META['HTTP_REFERER'])  
@@ -153,8 +174,9 @@ def edit(request,id):
 
 
 def hive_edit(request,id):
+    hive_column_details = HiveTableDetails.objects.filter(file_id=id).values()
     context = {
-        'csv_list': id,
+        'hive_column_details': hive_column_details,
     }
     return render(request,'common/hive_edit.html',context)
 
