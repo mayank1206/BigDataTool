@@ -130,7 +130,7 @@ $(document).ready(function(){
         var value = $('input[name="inlineRadioOptions"]:checked').val();
         if(value != null)
         {
-            window.location.href = "csv_edit/"+value;
+            window.location.href = "edit/"+value;
         }
     });
 

@@ -7,7 +7,7 @@ import json
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
-    
+
 def home(request):
     return render(request,'home.html')
 
@@ -118,6 +118,8 @@ def create(request,file_type):
             obj.table_name = request.POST['tableName']
             obj.database_name = request.POST['databaseName']
             obj.save()
+            #create process
+            # function(id,fileType)
             if request.POST['fileType'] == "CSV":
                 return redirect("csv_home")
             else:
@@ -133,28 +135,22 @@ def create(request,file_type):
 def edit(request,id):
     if request.method == 'POST':
         if request.POST['piplineName'] != "" and request.POST['fileType'] != "" and request.POST['filePath'] != "" and request.POST['scheduleTime'] != "" and request.POST['tableName'] != "" and request.POST['databaseName'] != "":
-            # Pipline_details = PiplineDetails.objects.filter(id=id).values()
-        # hive_details = CsvHiveTableDetails.objects.filter(csv_id=Pipline_details["csv_id"]).values()
-            # csv_id = models.AutoField(primary_key=True)
-            obj = PiplineDetails()
-            obj.text = request.POST['piplineName']
-            obj.file_type = request.POST['fileType']
-            obj.file_path = request.POST['filePath']
-            obj.schedule_time = request.POST['scheduleTime']
-            obj.table_name = request.POST['tableName']
-            obj.database_name = request.POST['databaseName']
-            obj.save()
+            PiplineDetails.objects.filter(id=request.POST['piplineId']).update(text = request.POST['piplineName'] ,file_path = request.POST['filePath'] , schedule_time = request.POST['scheduleTime'] , table_name = request.POST['tableName'], database_name = request.POST['databaseName'])
+            #edit process
             if request.POST['fileType'] == "CSV":
                 return redirect("csv_home")
             else:
                 return redirect("pdf_home")
         
-        return redirect(request.META['HTTP_REFERER'])  
+        return redirect(request.META['HTTP_REFERER'])
+     
     else:
+        pipline_details = PiplineDetails.objects.filter(id=id).values()
         context = {
-            'file_type': file_type,
+            'pipline_details': pipline_details,
         }
-        return render(request,'common/create.html',context)
+        return render(request,'common/edit.html',context)
+
 
 def hive_edit(request,id):
     context = {

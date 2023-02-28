@@ -13,14 +13,17 @@
         </div>
 	</div>
 	<div class="p-2">
-		<form>
-            <div class="mb-3">
+		<form action="" method="post">
+            {% csrf_token %}
+            <input type="hidden" class="form-control" name="piplineId" value="{{pipline_details.0.id}}">
+            <input type="hidden" class="form-control" name="fileType" value="{{pipline_details.0.file_type}}">
+			<div class="mb-3">
 				<div class="row g-3 align-items-center">
 					<div class="col-auto">
 			  			<label class="form-label" style="width: 130px;">Pipline Name</label>
 					</div>
 					<div class="col-auto">	
-						<input type="piplineName" class="form-control" id="piplineName" placeholder="Pipline name" value={{pipline_details.file_path}}>
+						<input type="piplineName" class="form-control" name="piplineName" placeholder="Pipline name" value="{{pipline_details.0.text}}">
 					</div>
 				</div>
 			</div>
@@ -30,7 +33,7 @@
 			  			<label class="form-label" style="width: 130px;">File Path</label>
 					</div>
 					<div class="col-auto">	
-						<input type="filePath" class="form-control" id="filePath" placeholder="HDFS file path" value={{pipline_details.file_path}}>
+						<input type="filePath" class="form-control" name="filePath" placeholder="HDFS file path" value="{{pipline_details.0.file_path}}">
 					</div>
 				</div>
 			</div>
@@ -40,7 +43,7 @@
 			  			<label class="form-label" style="width: 130px;">Schedule Time</label>
 					</div>
 					<div class="col-auto">	
-						<input type="scheduleTime" class="form-control" id="scheduleTime" placeholder="Schedule Cron Time" value={{pipline_details.schedule_time}}>
+						<input type="scheduleTime" class="form-control" name="scheduleTime" placeholder="Schedule Cron Time" value="{{pipline_details.0.schedule_time}}">
 					</div>
 				</div>
 			</div>
@@ -50,7 +53,7 @@
 			  			<label class="form-label" style="width: 130px;">Table Name</label>
 					</div>
 					<div class="col-auto">	
-						<input type="tableName" class="form-control" id="tableName" placeholder="Table Name" value={{pipline_details.table_name}}>
+						<input type="tableName" class="form-control" name="tableName" placeholder="Table Name" value="{{pipline_details.0.table_name}}">
 					</div>
 				</div>
 			</div>
@@ -60,11 +63,11 @@
 			  			<label class="form-label" style="width: 130px;">Database Name</label>
 					</div>
 					<div class="col-auto">	
-						<input type="databaseName" class="form-control" id="databaseName" placeholder="Database Name" value={{pipline_details.database_name}}>
+						<input type="databaseName" class="form-control" name="databaseName" placeholder="Database Name" value="{{pipline_details.0.database_name}}">
 					</div>
 				</div>
 			</div>
-			<button type="button" class="btn btn-primary new_csv_schedule" data-bs-dismiss="modal">Create</button>
+			<button type="submit" class="btn btn-primary">Edit</button>
 		</form> 
 	</div>
 </div>
