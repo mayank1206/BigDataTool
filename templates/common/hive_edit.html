@@ -23,20 +23,24 @@
 				</div>
 			</div>
 		</div>
-		{% for column in hive_column_details %}
-			<div class="mb-3">
-				<div class="row g-3 align-items-center">
-					<div class="col-auto me-2">
-						<input type="hiveColumnName" class="form-control" name="hiveColumnName" value="{{column.column_name}}">
-				    </div>
-					<div class="col-auto">	
-						<input type="csvColumnName" class="form-control" name="csvColumnName" value="{{column.file_column_name}}" readonly>	
+		<div id="columns">
+			{% for column in hive_column_details %}
+				<div class="mb-3">
+					<div class="row g-3 align-items-center">
+						<div class="col-auto me-2">
+							<input type="hiveColumnName" class="form-control" name="hiveColumnName{{column.id}}" value="{{column.column_name}}">
+						</div>
+						<div class="col-auto">	
+							<input type="csvColumnName" class="form-control" name="csvColumnName" value="{{column.file_column_name}}" readonly>	
+						</div>
+						<div class="col-auto"><button type="remove" class="btn btn-primary remove_column" value={{column.id}}>Remove</button></div>
+						<div class="col-auto"><button type="update" class="btn btn-primary update_column" value={{column.id}}>Update</button></div>	
 					</div>
-					<div class="col-auto"><button type="add" class="btn btn-primary">Remove</button></div>	
 				</div>
-			</div>
-		{% endfor %}
-		<button type="submit" class="btn btn-primary">Submit</button>
+			{% endfor %}
+		</div>
+		<input type="hidden" class="pipline_id" value={{id}}>
+		<button type="submit" class="btn btn-primary submit_hive_pipline">Submit</button>
 	</div>
 </div>
 <div class="min-height-bottom">

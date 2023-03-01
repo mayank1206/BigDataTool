@@ -126,12 +126,69 @@ $(document).ready(function(){
         });
     });
 
-    $('body').on('click' , '.edit_csv_details',function () {
-        var value = $('input[name="inlineRadioOptions"]:checked').val();
-        if(value != null)
-        {
-            window.location.href = "edit/"+value;
-        }
+    // $('body').on('click' , '.edit_csv_details',function () {
+    //     var value = $('input[name="inlineRadioOptions"]:checked').val();
+    //     if(value != null)
+    //     {
+    //         window.location.href = "edit/"+value;
+    //     }
+    // });
+
+//===================================common==========================================
+    $('body').on('click' , '.submit_hive_pipline',function () {
+        $.ajax({
+            url: '',
+            type: 'get',
+            data:{
+                action: "hive_csv",
+                id: $('.pipline_id').val()
+            },
+            success:function(response){
+                window.location.href = "/home";
+            }
+        });
+    });
+
+    $('body').on('click' , '.remove_column',function () {
+        $.ajax({
+            url: '',
+            type: 'get',
+            data:{
+                action: "remove_column",
+                column_id: $(this).attr('value'),
+                id: $('.pipline_id').val(),
+            },
+            success:function(response){
+                $("#columns").empty();
+                const columns = response;
+                for (column in columns) {
+                    const column_content = columns[column];
+                        $("#columns").append('<div class="mb-3"><div class="row g-3 align-items-center"><div class="col-auto me-2"><input type="hiveColumnName" class="form-control" name="hiveColumnName'+column_content["id"]+'" value="'+column_content["column_name"]+'"></div><div class="col-auto"><input type="csvColumnName" class="form-control" name="csvColumnName" value="'+column_content["file_column_name"]+'" readonly></div><div class="col-auto"><button type="remove" class="btn btn-primary remove_column" value="'+column_content["id"]+'">Remove</button></div><div class="col-auto"><button type="update" class="btn btn-primary update_column" value="'+column_content["id"]+'">Update</button></div></div></div>');
+                }
+            }
+        });
+    });
+
+    $('body').on('click' , '.update_column',function () {
+        var data = "hiveColumnName".concat($(this).attr('value'));
+        $.ajax({
+            url: '',
+            type: 'get',
+            data:{
+                action: "update_column",
+                column_id: $(this).attr('value'),
+                id: $('.pipline_id').val(),
+                new_name: $('input[name="'.concat(data).concat('"]')).val(),
+            },
+            success:function(response){
+                $("#columns").empty();
+                const columns = response;
+                for (column in columns) {
+                    const column_content = columns[column];
+                        $("#columns").append('<div class="mb-3"><div class="row g-3 align-items-center"><div class="col-auto me-2"><input type="hiveColumnName" class="form-control" name="hiveColumnName'+column_content["id"]+'" value="'+column_content["column_name"]+'"></div><div class="col-auto"><input type="csvColumnName" class="form-control" name="csvColumnName" value="'+column_content["file_column_name"]+'" readonly></div><div class="col-auto"><button type="remove" class="btn btn-primary remove_column" value="'+column_content["id"]+'">Remove</button></div><div class="col-auto"><button type="update" class="btn btn-primary update_column" value="'+column_content["id"]+'">Update</button></div></div></div>');
+                }
+            }
+        });
     });
 
 });

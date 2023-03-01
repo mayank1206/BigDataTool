@@ -30,7 +30,7 @@ def create_csv(id,path):
         obj.file_column_name = name
         obj.save()
 
-# os.system('(crontab -l 2>/dev/null; echo "'+schedule_time+' /path/to/job -with args") | crontab -')
+
 
 #==========================================DRIVE_HOME=================================================================
 current_path=""
@@ -127,6 +127,60 @@ def csv_home(request):
         }
         return render(request,'csv/csv_home.html',context)
 
+def hive_csv(id):
+    pipline_details = PiplineDetails.objects.filter(id=id).values()
+    for pipline_detail in pipline_details:
+        table_name =  pipline_detail["table_name"]
+        file_path =   pipline_detail["file_path"]
+        schedule_time =   pipline_detail["schedule_time"]
+
+    #hive command
+    unique_name = table_name+"_"+str(id)
+    hive_file = "/home/hadoop/project/BigDataTool/tool/temp_file/hive/"+unique_name+".hive"
+    
+    create_command= "DROP TABLE IF EXISTS "+table_name+"; create table "+table_name+"( "
+    hive_columns = HiveTableDetails.objects.filter(file_id=id).values()
+    column_list=[]
+    for hive_column in hive_columns:
+        column_list.append(hive_column["file_column_name"])
+        column = hive_column["column_name"].replace(" ", "_")
+        create_command = create_command+column+" string, "
+    
+    create_command = create_command[:-2]+") row format delimited fields terminated by ',';"
+
+    with open(hive_file, mode="w", encoding="utf-8") as file:
+        file.write(create_command)
+
+    os.system("hive -f "+hive_file)	
+    
+    # write multiple line code in python
+    python_file = "/home/hadoop/project/BigDataTool/tool/temp_file/script/"+unique_name+".py"
+    staging_area = "/home/hadoop/project/BigDataTool/tool/temp_file/stagging/"
+    with open(python_file, mode="w", encoding="utf-8") as file:
+        file.write('import os\n')
+        file.write('import pandas as pd\n')
+        file.write('os.system("rm '+staging_area+'*")\n')
+        file.write('os.system("hdfs dfs -get '+file_path+'/* '+staging_area+'")\n')
+        file.write('os.system("hdfs dfs -rm '+file_path+'/*")\n')
+        file.write('file_name = os.listdir("'+staging_area+'")\n')
+        file.write('input_file = pd.read_csv("'+staging_area+'"+file_name[0])\n')
+        file.write('output_data = input_file['+str(column_list)+']\n')
+        file.write('output_df = pd.DataFrame(output_data)\n')
+        file.write('output_df.to_csv("'+staging_area+'"+file_name[0], index=False,header=False)\n')
+        file.write('os.system("hdfs dfs -put '+staging_area+'* /user/hive/warehouse/'+table_name+'")\n')
+    
+    #cron job
+    os.system('crontab -r')
+    pipline_details = PiplineDetails.objects.values()
+    cronjobs=""
+    for pipline_detail in pipline_details:
+        id =   pipline_detail["id"]
+        table_name =  pipline_detail["table_name"]
+        schedule_time =   pipline_detail["schedule_time"]
+        cronjobs += schedule_time+" python3 /home/hadoop/project/BigDataTool/tool/temp_file/script/"+table_name+"_"+str(id)+".py"
+        os.system('(crontab -l 2>/dev/null; echo "'+cronjobs+'") | crontab -')
+    
+
 #==============================COMMON================================================================================
 def create(request,file_type):
     if request.method == 'POST':
@@ -162,9 +216,7 @@ def edit(request,id):
                 return redirect("csv_home")
             else:
                 return redirect("pdf_home")
-        
         return redirect(request.META['HTTP_REFERER'])
-     
     else:
         pipline_details = PiplineDetails.objects.filter(id=id).values()
         context = {
@@ -174,11 +226,40 @@ def edit(request,id):
 
 
 def hive_edit(request,id):
-    hive_column_details = HiveTableDetails.objects.filter(file_id=id).values()
-    context = {
-        'hive_column_details': hive_column_details,
-    }
-    return render(request,'common/hive_edit.html',context)
+    if is_ajax(request=request):
+        action = request.GET.get('action')
+
+        if action == "update_column":
+            column_id = int(request.GET.get('column_id'))
+            HiveTableDetails.objects.filter(id=column_id).update(column_name = request.GET.get('new_name'))
+
+            data = list(HiveTableDetails.objects.filter(file_id=int(request.GET.get('id'))).values())
+            return JsonResponse(data,safe=False)
+
+        elif action == "remove_column":
+            column_id = int(request.GET.get('column_id'))
+            HiveTableDetails.objects.filter(id=column_id).delete()
+
+            data = list(HiveTableDetails.objects.filter(file_id=int(request.GET.get('id'))).values())
+            return JsonResponse(data,safe=False)
+
+        elif action == "hive_csv":
+            hive_csv(int(request.GET.get('id')))
+            data = ["success"]
+            return JsonResponse(data,safe=False)
+
+        elif action == "pdf_csv":
+            # pdf_csv(int(request.GET.get('id')))
+            data = ["success"]
+            return JsonResponse(data,safe=False)
+        
+    else:
+        hive_column_details = HiveTableDetails.objects.filter(file_id=id).values()
+        context = {
+            'hive_column_details': hive_column_details,
+            'id':id,
+        }
+        return render(request,'common/hive_edit.html',context)
 
 #================================PDF_HOME===============================================================================
 def pdf_home(request):
