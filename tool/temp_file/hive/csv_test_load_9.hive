@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS csv_test_load; create table csv_test_load( Username string, Id string, First_name string) row format delimited fields terminated by ',';
