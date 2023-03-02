@@ -140,7 +140,7 @@ $(document).ready(function(){
             url: '',
             type: 'get',
             data:{
-                action: "hive_csv",
+                action: $('.hive_type_file').val(),
                 id: $('.pipline_id').val()
             },
             success:function(response){
@@ -186,6 +186,26 @@ $(document).ready(function(){
                 for (column in columns) {
                     const column_content = columns[column];
                         $("#columns").append('<div class="mb-3"><div class="row g-3 align-items-center"><div class="col-auto me-2"><input type="hiveColumnName" class="form-control" name="hiveColumnName'+column_content["id"]+'" value="'+column_content["column_name"]+'"></div><div class="col-auto"><input type="csvColumnName" class="form-control" name="csvColumnName" value="'+column_content["file_column_name"]+'" readonly></div><div class="col-auto"><button type="remove" class="btn btn-primary remove_column" value="'+column_content["id"]+'">Remove</button></div><div class="col-auto"><button type="update" class="btn btn-primary update_column" value="'+column_content["id"]+'">Update</button></div></div></div>');
+                }
+            }
+        });
+    });
+
+    //=================PDF==========================
+    $('body').on('click' , '.delete_pdf_schedule',function () {
+        $.ajax({
+            url: '',
+            type: 'get',
+            data:{
+                action: "delete_pdf_schedule",
+                pdf_schedule_id: $('input[name="inlineRadioOptions"]:checked').val(),
+            },
+            success:function(response){
+                $("#field_table").empty();
+                const pdf_list = response;
+                for (list in pdf_list) {
+                    const list_content = pdf_list[list];
+                    $("#field_table").append('<tr id="'+list_content["id"]+'"><td><div class="form-check"><input class="form-check-input" type="radio" name="inlineRadioOptions" value="'+list_content["id"]+'"><label class="form-check-label" for="inlineRadio1"><a href="/hive_edit/'+list_content["id"]+'">'+list_content["text"]+'</a></label></div></td></tr>');
                 }
             }
         });

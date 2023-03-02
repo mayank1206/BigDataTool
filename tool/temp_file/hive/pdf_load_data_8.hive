@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS pdf_load_data; create table pdf_load_data( date_create string, Open string, High string, low string, close_lost string) row format delimited fields terminated by ',';

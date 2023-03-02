@@ -5,7 +5,7 @@ from .models import PiplineDetails, HiveTableDetails
 import json 
 import os
 import csv
-
+import camelot
 
 def is_ajax(request):
     return request.META.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest'
@@ -29,6 +29,29 @@ def create_csv(id,path):
         obj.column_name = name
         obj.file_column_name = name
         obj.save()
+
+def create_pdf(id,path):
+    os.system("rm /home/hadoop/project/BigDataTool/tool/hold/*")
+    os.system("hdfs dfs -get "+path+"/* /home/hadoop/project/BigDataTool/tool/hold/")
+    file_name = os.listdir("/home/hadoop/project/BigDataTool/tool/hold/")
+    
+    tables = camelot.read_pdf("/home/hadoop/project/BigDataTool/tool/hold/"+file_name[0])
+    for i in tables:
+        df = i.df
+        break
+
+    df.columns = df.iloc[0]
+    df = df.drop(df.index[1])
+
+    header = df.columns.tolist()
+
+    for name in header:
+        obj = HiveTableDetails()
+        obj.file_id = id
+        obj.column_name = name
+        obj.file_column_name = name
+        obj.save()
+
 
 
 
@@ -116,12 +139,12 @@ def csv_home(request):
             id = request.GET.get('csv_schedule_id')
             if id != None:
                 #delete the Pipline data
-                PiplineDetails.objects.filter(id=id).delete()
+                PiplineDetails.objects.filter(file_type='CSV').delete()
                 
             data = list(PiplineDetails.objects.all().values())
             return JsonResponse(data,safe=False)
     else:
-        csv_list = PiplineDetails.objects.values()
+        csv_list = PiplineDetails.objects.filter(file_type='CSV').values()
         context = {
             'csv_list': csv_list,
         }
@@ -156,30 +179,120 @@ def hive_csv(id):
     # write multiple line code in python
     python_file = "/home/hadoop/project/BigDataTool/tool/temp_file/script/"+unique_name+".py"
     staging_area = "/home/hadoop/project/BigDataTool/tool/temp_file/stagging/"
+    convert_area = "/home/hadoop/project/BigDataTool/tool/temp_file/convert/"
     with open(python_file, mode="w", encoding="utf-8") as file:
         file.write('import os\n')
         file.write('import pandas as pd\n')
         file.write('os.system("rm '+staging_area+'*")\n')
+        file.write('os.system("rm '+convert_area+'*")\n')
         file.write('os.system("hdfs dfs -get '+file_path+'/* '+staging_area+'")\n')
         file.write('os.system("hdfs dfs -rm '+file_path+'/*")\n')
         file.write('file_name = os.listdir("'+staging_area+'")\n')
         file.write('input_file = pd.read_csv("'+staging_area+'"+file_name[0])\n')
         file.write('output_data = input_file['+str(column_list)+']\n')
         file.write('output_df = pd.DataFrame(output_data)\n')
-        file.write('output_df.to_csv("'+staging_area+'"+file_name[0], index=False,header=False)\n')
-        file.write('os.system("hdfs dfs -put '+staging_area+'* /user/hive/warehouse/'+table_name+'")\n')
+        file.write('output_df.to_csv("'+convert_area+'"+file_name[0], index=False,header=False)\n')
+        file.write('os.system("hdfs dfs -put '+convert_area+'* /user/hive/warehouse/'+table_name+'")\n')
     
     #cron job
     os.system('crontab -r')
     pipline_details = PiplineDetails.objects.values()
     cronjobs=""
+    command=""
     for pipline_detail in pipline_details:
+        cronjobs=""
         id =   pipline_detail["id"]
         table_name =  pipline_detail["table_name"]
         schedule_time =   pipline_detail["schedule_time"]
-        cronjobs += schedule_time+" python3 /home/hadoop/project/BigDataTool/tool/temp_file/script/"+table_name+"_"+str(id)+".py"
-        os.system('(crontab -l 2>/dev/null; echo "'+cronjobs+'") | crontab -')
+        cronjobs += schedule_time+" /usr/bin/python3 /home/hadoop/project/BigDataTool/tool/temp_file/script/"+table_name+"_"+str(id)+".py"
+        command += 'echo "'+cronjobs+'"; '
+    command = '('+command+') | crontab -'
+    print(command)
+    os.system(command)
+
+#================================PDF_HOME===============================================================================
+def pdf_home(request):
+    if is_ajax(request=request):
+        action = request.GET.get('action')
+        if action == "delete_pdf_schedule":
+            id = request.GET.get('pdf_schedule_id')
+            if id != None:
+                #delete the Pipline data
+                PiplineDetails.objects.filter(id=id).delete()
+                
+            data = list(PiplineDetails.objects.filter(file_type='PDF').values())
+            return JsonResponse(data,safe=False)
+    else:
+        pdf_list = PiplineDetails.objects.filter(file_type='PDF').values()
+        # 
+        context = {
+            'pdf_list': pdf_list,
+        }
+        return render(request,'pdf/pdf_home.html',context)
+
+def hive_pdf(id):
+    pipline_details = PiplineDetails.objects.filter(id=id).values()
+    for pipline_detail in pipline_details:
+        table_name =  pipline_detail["table_name"]
+        file_path =   pipline_detail["file_path"]
+        schedule_time =   pipline_detail["schedule_time"]
+
+    #hive command
+    unique_name = table_name+"_"+str(id)
+    hive_file = "/home/hadoop/project/BigDataTool/tool/temp_file/hive/"+unique_name+".hive"
     
+    create_command= "DROP TABLE IF EXISTS "+table_name+"; create table "+table_name+"( "
+    hive_columns = HiveTableDetails.objects.filter(file_id=id).values()
+    column_list=[]
+    for hive_column in hive_columns:
+        column_list.append(hive_column["file_column_name"])
+        column = hive_column["column_name"].replace(" ", "_")
+        create_command = create_command+column+" string, "
+    
+    create_command = create_command[:-2]+") row format delimited fields terminated by ',';"
+
+    with open(hive_file, mode="w", encoding="utf-8") as file:
+        file.write(create_command)
+
+    os.system("hive -f "+hive_file)	
+    
+    # write multiple line code in python
+    python_file = "/home/hadoop/project/BigDataTool/tool/temp_file/script/"+unique_name+".py"
+    staging_area = "/home/hadoop/project/BigDataTool/tool/temp_file/stagging/"
+    convert_area = "/home/hadoop/project/BigDataTool/tool/temp_file/convert/"
+    with open(python_file, mode="w", encoding="utf-8") as file:
+        file.write('import os\n')
+        file.write('import camelot\n')
+        file.write('os.system("rm '+staging_area+'*")\n')
+        file.write('os.system("rm '+convert_area+'*")\n')
+        file.write('os.system("hdfs dfs -get '+file_path+'/* '+staging_area+'")\n')
+        file.write('os.system("hdfs dfs -rm '+file_path+'/*")\n')
+        file.write('file_name = os.listdir("'+staging_area+'")\n')
+        file.write('input_file = camelot.read_pdf("'+staging_area+'"+file_name[0])\n')
+        file.write('df = input_file[0].df\n')
+        file.write('df.columns = df.iloc[0]\n')
+        file.write('df = df.drop(df.index[1])\n')
+        file.write('output_df = df['+str(column_list)+']\n')
+        file.write('output_df = output_df.drop(index=0)\n')
+        # file.write('output_df = pd.DataFrame(output_data)\n')
+        file.write('output_df.to_csv("'+convert_area+'"+file_name[0]+".csv", index=False,header=False)\n')
+        file.write('os.system("hdfs dfs -put '+convert_area+'* /user/hive/warehouse/'+table_name+'")\n')
+    
+    #cron job
+    os.system('crontab -r')
+    pipline_details = PiplineDetails.objects.values()
+    cronjobs=""
+    command=""
+    for pipline_detail in pipline_details:
+        cronjobs=""
+        id =   pipline_detail["id"]
+        table_name =  pipline_detail["table_name"]
+        schedule_time =   pipline_detail["schedule_time"]
+        cronjobs += schedule_time+" /usr/bin/python3 /home/hadoop/project/BigDataTool/tool/temp_file/script/"+table_name+"_"+str(id)+".py"
+        command += 'echo "'+cronjobs+'"; '
+    command = '('+command+') | crontab -'
+    print(command)
+    os.system(command)
 
 #==============================COMMON================================================================================
 def create(request,file_type):
@@ -197,7 +310,7 @@ def create(request,file_type):
                 create_csv(obj.pk,request.POST['filePath'])
                 return redirect("csv_home")
             else:
-                #create_pdf
+                create_pdf(obj.pk,request.POST['filePath'])
                 return redirect("pdf_home")
         
         return redirect(request.META['HTTP_REFERER'])  
@@ -248,22 +361,29 @@ def hive_edit(request,id):
             data = ["success"]
             return JsonResponse(data,safe=False)
 
-        elif action == "pdf_csv":
-            # pdf_csv(int(request.GET.get('id')))
+        elif action == "hive_pdf":
+            hive_pdf(int(request.GET.get('id')))
             data = ["success"]
             return JsonResponse(data,safe=False)
         
     else:
+        pipline_details = PiplineDetails.objects.filter(id=id).values()
+        for pipline_detail in pipline_details:
+            file_type =  pipline_detail["file_type"]
+        if file_type == "CSV":
+            hive_type = "hive_csv"
+        else:
+            hive_type = "hive_pdf"
+
         hive_column_details = HiveTableDetails.objects.filter(file_id=id).values()
         context = {
             'hive_column_details': hive_column_details,
             'id':id,
+            'hive_type':hive_type,
         }
         return render(request,'common/hive_edit.html',context)
 
-#================================PDF_HOME===============================================================================
-def pdf_home(request):
-    return render(request,'pdf/pdf_home.html')
+
  
 
 

@@ -1,8 +1,48 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container p-5 my-5 border">
-    <h1>pdf</h1>
-    <p>create pdf</p>
+<div class="container shadow-container min-height-con mt-5 overflow-hidden round-edge">
+	<div class="row bg-dark text-white">
+		<div class="col-sm-10 p-3">
+			<h2>PDF Automation</h2>
+		</div>
+		<div class="col-sm-2 p-3">
+            <div class="float-end">
+			    <button type="button" class="btn icon-color btn-circle btn-lg">
+                    <a href="{% url 'create' file_type='PDF' %}"> 
+                        <i class="fa fa-plus" aria-hidden="true"></i>
+                    </a>
+                </button>
+                <!-- <button type="button" class="btn icon-color btn-circle btn-lg edit_csv_details">
+                    <i class="fa fa-pencil" aria-hidden="true"></i>
+                </button> -->
+                <button type="button" class="btn icon-color btn-circle btn-lg delete_pdf_schedule">
+                    <i class="fa fa-minus" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+	</div>
+	<div class="p-2">
+		<table class="table">
+            <tbody id="field_table" >
+                {% for list in pdf_list %}
+                <tr>
+                    <td>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="inlineRadioOptions" value={{list.id}}>
+                            <label class="form-check-label" for="inlineRadio1">
+                                <a href="{% url 'hive_edit' id=list.id %}"> 
+                                    {{list.text}}
+                                </a>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %} 
+            </tbody>
+        </table> 
+	</div>
+</div>
+<div class="min-height-bottom">
 </div>
 {% endblock %}

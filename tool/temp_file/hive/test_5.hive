@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS test; create table test( Username string, Identifier string, Last_name string) row format delimited fields terminated by ',';
